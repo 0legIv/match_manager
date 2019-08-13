@@ -10,5 +10,7 @@ defmodule MatchManagerWeb.Router do
 
     get "/matches", MatchController, :list_matches
     get "/matches/:div/:season", MatchController, :show_matches
+
+    get "/matches/protobuf", MatchController, :list_matches_protobuf
   end
 end

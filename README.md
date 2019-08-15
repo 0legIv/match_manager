@@ -39,6 +39,8 @@ To run the docker container with this variables:
 
 Example: `docker run -e PORT=4002 -e DATA_FILE="data.csv" -i -t --net=host match_manager:latest`
 
+**By default dockerfile has predefined PORT=4001 and DATA_FILE="data.csv"**
+
 ## Endpoints
 
 Default port for the application in prod - `4001`
@@ -48,4 +50,4 @@ Default port for the application in prod - `4001`
 * `localhost:4001/matches/:div/:season` - retrieve the results for a specific league and season pair in JSON
 
 * `localhost:4001/matches/proto` - list all data from the csv file in Protocol Buffers
-*  `localhost:4001/matches/proto/:div/:season` - retrieve the results for a specific league and season pair in Protocol Buffers
+* `localhost:4001/matches/proto/:div/:season` - retrieve the results for a specific league and season pair in Protocol Buffers

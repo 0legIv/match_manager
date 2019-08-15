@@ -31,13 +31,16 @@ defmodule MatchManagerWeb.MatchController do
   end
 
   def show_matches_proto(conn, %{"div" => div, "season" => season}) do
-    matches = MatchStore.find_matches(div, season)
+    case MatchStore.find_matches(div, season) do
+      {:ok, matches} ->
+        matches_encoded =
+        season
+        |> Season.to_struct(matches)
+        |> Season.encode()
+        render(conn, "show.proto", matches: matches_encoded)
 
-    matches_encoded =
-      season
-      |> Season.to_struct(matches)
-      |> Season.encode()
-
-    render(conn, "show.proto", matches: matches_encoded)
+      {:error, reason} ->
+        render(conn, "error.json", %{reason: reason})
+    end
   end
 end

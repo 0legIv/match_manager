@@ -1,18 +1,51 @@
 # MatchManager
 
-To start your Phoenix server:
+## Application workflow
 
-  * Install dependencies with `mix deps.get`
-  * Start Phoenix endpoint with `mix phx.server`
+* When started, the application reads the csv file and save the result to the GenServer state, module - `MatchManager.MatchStore`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+* There are the endpoints that receive get request and call the following functions in the `MatchManagerWeb.MatchController`
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+* These functions call corresponding functions in `MatchManager.MatchStore` depending on the requested result (JSON, Protocol Buffers)
 
-## Learn more
+* To create the result there are unified structures that can be found in `match_manager/structures`. 
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+## Starting the application
+
+Start the application in the IEX:
+
+* Enter the root directory of the application
+* `mix deps.get`
+* `iex -S mix phx.server`
+
+Start the application with Docker:
+
+* Enter the root directory of the application
+* `docker build -t match_manager .`
+* `docker run -i -t --net=host match_manager:latest`
+
+Running the tests: 
+
+* Enter the root directory of the application
+* `mix deps.get`
+* `mix test`
+
+## ENV variables
+
+* `${PORT}` - port on which the application will be launched
+* `${DATA_FILE}` - csv file with match results
+
+To run the docker container with this variables:
+
+Example: `docker run -e PORT=4002 -e DATA_FILE="data.csv" -i -t --net=host match_manager:latest`
+
+## Endpoints
+
+Default port for the application in prod - `4001`
+
+`GET` request:
+* `localhost:4001/matches` - list all data from the csv file in JSON
+* `localhost:4001/matches/:div/:season` - retrieve the results for a specific league and season pair in JSON
+
+* `localhost:4001/matches/proto` - list all data from the csv file in Protocol Buffers
+*  `localhost:4001/matches/proto/:div/:season` - retrieve the results for a specific league and season pair in Protocol Buffers

@@ -6,5 +6,7 @@ config :match_manager, MatchManagerWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :match_manager, :data_file, "data.csv"
+
 # Print only warnings and errors during test
 config :logger, level: :warn

@@ -1,6 +1,7 @@
 defmodule MatchManager.MatchStore do
   use GenServer
   alias MatchManager.Structures.MatchDiv
+  alias MatchManager.Protobuf.MatchResults
 
   require Logger
 
@@ -26,24 +27,48 @@ defmodule MatchManager.MatchStore do
     {:ok, data}
   end
 
+  @spec list_data() :: map()
   def list_data() do
     GenServer.call(__MODULE__, :list_data)
   end
 
+  @spec find_matches(String.t(), String.t()) :: list()
   def find_matches(div, season) do
     GenServer.call(__MODULE__, {:find_matches, div, season})
   end
 
+  @spec update_state_from_file(String.t()) :: :ok
   def update_state_from_file(path) do
     GenServer.call(__MODULE__, {:update_state, path})
   end
 
+  @spec list_data_json() :: list()
   def list_data_json() do
-    list_data()
-    |> MatchDiv.to_struct()
-    |> MatchDiv.from_struct()
+    case list_data() do
+      data when data == %{} ->
+        {:error, :no_data}
+
+      {:error, reason} ->
+        {:error, reason}
+
+      matches ->
+        matches_json =
+          matches
+          |> MatchDiv.to_struct()
+          |> MatchDiv.from_struct()
+
+        {:ok, matches_json}
+    end
   end
 
+  @spec list_data_proto() :: binary()
+  def list_data_proto() do
+    list_data()
+    |> MatchResults.to_struct()
+    |> MatchResults.encode()
+  end
+
+  @spec parse_csv(String.t()) :: {:ok, list()} | {:error, String.t()}
   def parse_csv(path) do
     if File.exists?(path) do
       parsed_data =
@@ -79,12 +104,23 @@ defmodule MatchManager.MatchStore do
   end
 
   def handle_call({:find_matches, div, season}, _from, state) do
-    matches = state[div][season]
-    {:reply, matches, state}
+    case get_in(state, [div, season]) do
+      nil ->
+        Logger.error("Matches not found")
+        {:reply, {:error, :match_not_found}, state}
+
+      matches ->
+        {:reply, {:ok, matches}, state}
+    end
   end
 
   def handle_call({:update_state, path}, _from, _state) do
-    decoded_file = parse_csv(path)
-    {:reply, :ok, decoded_file}
+    case parse_csv(path) do
+      {:ok, decoded_file} ->
+        {:reply, :ok, decoded_file}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, %{}}
+    end
   end
 end

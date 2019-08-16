@@ -51,3 +51,13 @@ Default port for the application in prod - `4001`
 
 * `localhost:4001/matches/proto` - list all data from the csv file in Protocol Buffers
 * `localhost:4001/matches/proto/:div/:season` - retrieve the results for a specific league and season pair in Protocol Buffers
+
+Docker compose with load balancer:
+
+* Enter the root directory of the application
+* `docker build -t match_manager .`
+* `docker swarm init`
+* `docker stack deploy --compose-file=docker-compose.yml name`
+
+After that, the endpoints will be available without specifying the port.
+Example: `localhost/matches`

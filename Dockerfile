@@ -27,4 +27,4 @@ RUN tar -xf /tmp/match_manager.tar.gz --directory . \
     && rm /tmp/match_manager.tar.gz
 
 ENTRYPOINT ["bin/match_manager"]
-CMD ["console"]
+CMD ["foreground"]
